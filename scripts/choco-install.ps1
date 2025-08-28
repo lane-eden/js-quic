@@ -23,9 +23,8 @@ choco source add --name="cache" --source="${PSScriptRoot}\..\tmp\chocolatey" --p
 
 # Install nodejs v20.5.1 (will use cache if exists)
 $nodejs = "nodejs"
-choco install "$nodejs" --version="20.5.1" --require-checksums -y --no-progress
-# Internalise nodejs to cache if doesn't exist
-if ( -not (Test-Path -Path "${PSScriptRoot}\..\tmp\chocolatey\$nodejs\$nodejs.20.5.1.nupkg" -PathType Leaf) ) {
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+  choco install "$nodejs" --version="20.5.1" --require-checksums -y --no-progress
   Save-ChocoPackage -PackageName $nodejs
 }
 
