@@ -28,13 +28,15 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
   Save-ChocoPackage -PackageName $nodejs
 }
 
-# Install rust v1.68.0 (will use cache if exists)
-$rust = "rust-ms"
-choco install "$rust" --version="1.68.0" --require-checksums -y --no-progress
-# Internalise rust to cache if doesn't exist
-if ( -not (Test-Path -Path "${PSScriptRoot}\..\tmp\chocolatey\$rust\$rust.1.68.0.nupkg" -PathType Leaf) ) {
-  Save-ChocoPackage -PackageName $rust
+# Install rust v1.70.0
+if (-not (Get-Command rustup -ErrorAction SilentlyContinue)) {
+  Write-Error "Rustup is unexpectedly missing"; exit 1
 }
+$toolchain = '1.70.0'
+Write-Host "Installing Rust toolchain $toolchain via rustup"
+rustup toolchain install $toolchain --profile minimal
+rustup default $toolchain
+rustup target add x86_64-pc-windows-msvc aarch64-pc-windows-msvc
 
 # Install llvm v16.0.3 (will use cache if exists)
 $llvm = "llvm"
