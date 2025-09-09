@@ -2,10 +2,10 @@ import type QUICServer from './QUICServer.js';
 import type { Host, Hostname, Port, ResolveHostname } from './types.js';
 import type { Header } from './native/types.js';
 import dgram from 'dgram';
-import Logger from '@matrixai/logger';
-import { startStop } from '@matrixai/async-init';
-import { utils as errorsUtils } from '@matrixai/errors';
-import { utils as eventsUtils } from '@matrixai/events';
+import Logger from './logger/index.js';
+import { startStop } from './async-init/index.js';
+import { utils as errorsUtils } from './errors/index.js';
+import { utils as eventsUtils } from './events/index.js';
 import QUICConnectionId from './QUICConnectionId.js';
 import QUICConnectionMap from './QUICConnectionMap.js';
 import quiche from './native/quiche.js';
@@ -104,7 +104,7 @@ class QUICSocket {
     // All QUIC packets will have the `dcid` header property
     // However short packets will not have the `scid` property
     // The destination connection ID is supposed to be our connection ID
-    const dcid = new QUICConnectionId(header.dcid);
+    const dcid = new QUICConnectionId(header.getDcid());
     const remoteInfo_ = {
       host: remoteInfo.address as Host,
       port: remoteInfo.port as Port,

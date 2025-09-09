@@ -162,6 +162,7 @@ interface Header {
   scid: Uint8Array;
   token?: Uint8Array;
   versions?: Array<number>;
+  getDcid(): Uint8Array;
 }
 
 interface HeaderConstructor {
@@ -268,19 +269,6 @@ type Stats = {
   lostBytes: number;
   streamRetransBytes: number;
   pathsCount: number;
-  peerMaxIdleTimeout: number;
-  peerMaxUdpPayloadSize: number;
-  peerInitialMaxData: number;
-  peerInitialMaxStreamDataBidiLocal: number;
-  peerInitialMaxStreamDataBidiRemote: number;
-  peerInitialMaxStreamDataUni: number;
-  peerInitialMaxStreamsBidi: number;
-  peerInitialMaxStreamsUni: number;
-  peerAckDelayExponent: number;
-  peerMaxAckDelay: number;
-  peerDisableActiveMigration: boolean;
-  peerActiveConnIdLimit: number;
-  peerMaxDatagramFrameSize?: number;
 };
 
 type HostPort = {

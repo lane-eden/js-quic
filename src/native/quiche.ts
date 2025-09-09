@@ -17,21 +17,6 @@ import path from 'path';
 import url from 'url';
 import Module from 'node:module';
 
-function getRequireAndDirname() {
-  try {
-    // ESM
-    const Module = require('module');
-    const requireFn = Module.createRequire(import.meta.url);
-    const dirname = url.fileURLToPath(new URL('.', import.meta.url));
-    return { require: requireFn, dirname };
-  } catch {
-    // CJS
-    return { require, dirname: __dirname };
-  }
-}
-
-const { require, dirname } = getRequireAndDirname();
-
 interface Quiche {
   MAX_CONN_ID_LEN: number;
   MIN_CLIENT_INITIAL_LEN: number;
@@ -65,38 +50,51 @@ interface Quiche {
   Header: HeaderConstructor;
 }
 
-const projectRoot = path.join(dirname, '../../');
-const prebuildPath = path.join(projectRoot, 'prebuild');
-
 /**
  * Try require on all prebuild targets first, then
  * try require on all npm targets second.
  */
 function requireBinding(targets: Array<string>): Quiche {
+  let requireFn: NodeRequire;
+  let dirname: string;
+
+  try {
+    // ESM
+    requireFn = Module.createRequire(import.meta.url);
+    dirname = url.fileURLToPath(new URL('.', import.meta.url));
+  } catch {
+    // CJS
+    requireFn = require;
+    dirname = __dirname;
+  }
+
+  const projectRoot = path.join(dirname, '../../');
+  const prebuildPath = path.join(projectRoot, 'prebuild');
+
   const prebuildTargets = targets.map((target) =>
     path.join(prebuildPath, `quic-${target}.node`),
   );
   for (const prebuildTarget of prebuildTargets) {
     try {
-      return require(prebuildTarget);
+      return requireFn(prebuildTarget);
     } catch (e) {
       if (e.code !== 'MODULE_NOT_FOUND') throw e;
     }
     try {
-      return require(url.pathToFileURL(prebuildTarget).href);
+      return requireFn(url.pathToFileURL(prebuildTarget).href);
     } catch (e) {
       if (e.code !== 'MODULE_NOT_FOUND') throw e;
     }
   }
-  const npmTargets = targets.map((target) => `@matrixai/quic-${target}`);
+  const npmTargets = targets.map((target) => `@rs/quic-${target}`);
   for (const npmTarget of npmTargets) {
     try {
-      return require(npmTarget);
+      return requireFn(npmTarget);
     } catch (e) {
       if (e.code !== 'MODULE_NOT_FOUND') throw e;
     }
     try {
-      return require(url.pathToFileURL(npmTarget).href);
+      return requireFn(url.pathToFileURL(npmTarget).href);
     } catch (e) {
       if (e.code !== 'MODULE_NOT_FOUND') throw e;
     }

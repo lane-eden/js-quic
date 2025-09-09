@@ -1,6 +1,6 @@
 {
   "name": "@rs/quic",
-  "version": "2.1.0",
+  "version": "2.2.1",
   "author": "Matrix AI",
   "contributors": [
     {
@@ -14,21 +14,33 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MatrixAI/js-quic.git"
+    "url": "https://github.com/rs/js-quic.git"
   },
   "type": "module",
   "main": "dist/index.cjs.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.cjs.js"
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./*.js": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    },
+    "./*": "./dist/*"
+  },
+  "imports": {
+    "#*": "./dist/*"
   },
   "napi": {
     "name": "quic"
   },
   "scripts": {
-    "prepare": "tsc -p ./tsconfig.build.json",
+    "prepare": "tsup --tsconfig ./tsconfig.build.json",
     "prebuild": "node ./scripts/prebuild.mjs",
     "build": "shx rm -rf ./dist && tsup",
     "version": "node ./scripts/version.mjs",
@@ -42,23 +54,15 @@
     "bench": "tsc -p ./tsconfig.build.json && shx rm -rf ./benches/results && tsx ./benches/index.ts"
   },
   "dependencies": {
-    "@matrixai/async-cancellable": "^2.0.1",
-    "@matrixai/async-init": "^2.1.2",
-    "@matrixai/async-locks": "^5.0.2",
-    "@matrixai/contexts": "^2.0.2",
-    "@matrixai/errors": "^2.1.3",
-    "@matrixai/events": "^4.0.1",
-    "@matrixai/logger": "^4.0.3",
-    "@matrixai/resources": "^2.0.1",
-    "@matrixai/timer": "^2.1.1",
-    "ip-num": "^1.5.0"
+    "ip-num": "^1.5.0",
+    "ts-custom-error": "^3.2.2"
   },
   "optionalDependencies": {
-    "@matrixai/quic-darwin-arm64": "2.0.9",
-    "@matrixai/quic-darwin-universal": "2.0.9",
-    "@matrixai/quic-darwin-x64": "2.0.9",
-    "@matrixai/quic-linux-x64": "2.0.9",
-    "@matrixai/quic-win32-x64": "2.0.9"
+    "@rs/quic-darwin-arm64": "2.0.9",
+    "@rs/quic-darwin-universal": "2.0.9",
+    "@rs/quic-darwin-x64": "2.0.9",
+    "@rs/quic-linux-x64": "2.0.9",
+    "@rs/quic-win32-x64": "2.0.9"
   },
   "devDependencies": {
     "@fast-check/jest": "^2.1.0",
